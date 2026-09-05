@@ -49,6 +49,7 @@ describe("facts", () => {
   });
 
   it("writes a number-sense tip", () => {
+    expect(makeFact("add", 0, 5).tip).toMatch(/zero plus 5 stays 5/i);
     expect(makeFact("add", 7, 3).tip).toMatch(/friendly ten/i);
     expect(makeFact("mul", 5, 4).tip).toMatch(/fives/i);
     expect(makeFact("div", 20, 5).tip).toMatch(/5s fit in 20/i);

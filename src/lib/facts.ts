@@ -35,6 +35,8 @@ export function applyOp(op: Operation, a: number, b: number): number {
 
 export function tipFor(op: Operation, a: number, b: number, answer: number): string {
   if (op === "add") {
+    if (a === 0) return `Zero plus ${b} stays ${b}.`;
+    if (b === 0) return `${a} plus zero stays ${a}.`;
     if (a === b) return `Doubles are lantern twins: ${a} + ${a} = ${answer}.`;
     if (a + b === 10) return `${a} and ${b} make a friendly ten.`;
     if (a + b === 20) return `${a} + ${b} fills a double ten.`;

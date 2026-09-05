@@ -173,6 +173,7 @@ h1 { font-size: clamp(2rem, 5vw, 3.6rem); }
   margin-bottom: 18px;
 }
 .map-who { display: flex; align-items: center; gap: 10px; }
+.map-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
 .worlds { display: grid; gap: 18px; }
 .world {
   border-radius: 22px;

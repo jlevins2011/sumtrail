@@ -28,15 +28,17 @@ export function TrailMap() {
             </p>
           </div>
         </div>
-        <button className="btn primary" onClick={() => dispatch({ type: "go", view: { name: "lesson", lessonId: rec } })}>
-          Continue
-        </button>
-        <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "journal" } })}>
-          Journal
-        </button>
-        <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "settings" } })}>
-          Settings
-        </button>
+        <div className="map-actions">
+          <button className="btn primary" onClick={() => dispatch({ type: "go", view: { name: "lesson", lessonId: rec } })}>
+            Continue
+          </button>
+          <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "journal" } })}>
+            Journal
+          </button>
+          <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "settings" } })}>
+            Settings
+          </button>
+        </div>
       </header>
 
       {demo && <p className="demo-banner">Demo mode keeps later camps folded until the family hub unlocks them.</p>}
