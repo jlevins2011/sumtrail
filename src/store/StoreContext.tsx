@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useState, type Dispatch, type ReactNode } from "react";
 import { getLesson } from "../data/curriculum";
-import { earnCampCredits } from "../lib/credits";
+import { clearDraft } from "../lib/trailDraft";
+import { setAudioEnabled } from "../lib/audio";
+import { availableLanterns } from "../lib/keepsakes";
 import { isDemoMode } from "../lib/demo";
 import { evaluateRound } from "../lib/engine";
 import {
@@ -11,7 +13,6 @@ import {
   hashPin,
   loadStore,
   mergeLessonRecord,
-  newId,
   saveStore,
 } from "../lib/storage";
 import { hasChosenStartLevel, startLevelFor } from "../lib/startLevel";
@@ -20,6 +21,8 @@ import { MAX_PROFILES } from "../types";
 
 export type RecordSessionPayload = {
   lessonId: string;
+  sessionId: string;
+  startedAt: number;
   durationMs: number;
   correct: number;
   errors: number;
@@ -30,6 +33,7 @@ export type RecordSessionPayload = {
   journal: JournalEntry[];
   responseMs: number[];
   finished: boolean;
+  correctedFacts?: string[];
 };
 
 type Action =
@@ -39,6 +43,7 @@ type Action =
   | { type: "select-child"; id: string }
   | { type: "set-start-level"; id: string; gradeBand: GradeBand }
   | { type: "delete-child"; id: string }
+  | { type: "set-lantern"; id: string; lanternStyle: string }
   | { type: "set-pin"; pin: string }
   | { type: "clear-pin" }
   | { type: "settings"; patch: Partial<Settings> }
@@ -89,6 +94,8 @@ function reducer(state: State, action: Action): State {
         state.activeChildId === action.id ? (children[0]?.id ?? null) : state.activeChildId;
       return { ...state, children, activeChildId };
     }
+    case "set-lantern":
+      return {...state,children:state.children.map(child=>child.id===action.id && availableLanterns(child).some(l=>l.id===action.lanternStyle) ? {...child,lanternStyle:action.lanternStyle} : child)};
     case "set-pin":
       return { ...state, parentPin: hashPin(action.pin) };
     case "clear-pin":
@@ -100,13 +107,14 @@ function reducer(state: State, action: Action): State {
       if (!childId) return state;
       const lesson = getLesson(action.lessonId);
       if (!lesson) return state;
+      if (state.children.find(c=>c.id===childId)?.sessions.some(s=>s.id===action.sessionId)) return state;
       const result = evaluateRound(lesson, action.correct, action.errors, action.responseMs);
       const passed = action.finished && result.passed;
       const session = {
-        id: newId(),
+        id: action.sessionId,
         childId,
         lessonId: action.lessonId,
-        startedAt: Date.now() - action.durationMs,
+        startedAt: action.startedAt,
         durationMs: action.durationMs,
         accuracy: result.accuracy,
         errors: action.errors,
@@ -118,6 +126,7 @@ function reducer(state: State, action: Action): State {
         passed,
         factsFound: action.factsFound,
         smoothness: result.smoothness,
+        correctedFacts: action.correctedFacts ?? [],
       };
       return {
         ...state,
@@ -128,7 +137,6 @@ function reducer(state: State, action: Action): State {
           let campsCleared = updated.campsCleared;
           if (passed && lesson.clearsCamp && !campsCleared.includes(lesson.worldId)) {
             campsCleared = [...campsCleared, lesson.worldId];
-            earnCampCredits(child.id, lesson.worldId);
           }
           if (!passed) {
             return {
@@ -173,6 +181,7 @@ const StoreContext = createContext<{
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, { ...emptyStore(), view: { name: "title" } });
   const [hydrated, setHydrated] = useState(false);
+  const [saveError,setSaveError] = useState(false);
 
   useEffect(() => {
     dispatch({ type: "hydrate", data: loadStore() });
@@ -182,11 +191,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hydrated) return;
     const { version, parentPin, children: kids, activeChildId, settings } = state;
-    saveStore({ version, parentPin, children: kids, activeChildId, settings });
+    try {
+      saveStore({ version, parentPin, children: kids, activeChildId, settings });
+      setSaveError(false);
+      if(state.view.name==='results' && activeChildId) clearDraft(activeChildId,state.view.lessonId);
+    } catch {setSaveError(true);}
   }, [state, hydrated]);
 
+  useEffect(() => { setAudioEnabled(state.settings.sound); }, [state.settings.sound]);
+
   const value = useMemo(() => ({ state, dispatch }), [state]);
-  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+  return <StoreContext.Provider value={value}>{saveError && <p role="alert" className="save-alert">This browser could not save progress. Keep this page open and free some browser storage before leaving.</p>}{children}</StoreContext.Provider>;
 }
 
 export function useStore() {

@@ -14,6 +14,7 @@ export type View =
   | { name: "profiles" }
   | { name: "start-level" }
   | { name: "map" }
+  | { name: "workshop"; worldId: string }
   | { name: "lesson"; lessonId: string }
   | { name: "results"; lessonId: string; sessionId: string }
   | { name: "parent-gate" }
@@ -101,6 +102,8 @@ export type Session = {
   passed: boolean;
   factsFound: string[];
   smoothness: number;
+  /** Corrected after feedback; never added to independent accuracy. */
+  correctedFacts?: string[];
 };
 
 export type Child = {
@@ -114,6 +117,7 @@ export type Child = {
   journal: JournalEntry[];
   campsCleared: string[];
   /** Grade band chosen at setup; missing on profiles created before start-level. */
+  lanternStyle?: string;
   gradeBand?: GradeBand;
   /** Camp id to begin at; camps at or below this stay open for review. */
   startWorldId?: string;

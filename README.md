@@ -1,76 +1,56 @@
-# Sumtrail
+# Sumtrail 2.0 — the lantern keepers’ trail
 
-An original math facts fluency adventure for kids. Light lanterns with Pip the fox through add, subtract, multiply, and divide — with stars, a number-sense journal, and PIN-protected parent reports.
+An original math facts adventure with Pip the fox: hands-on workshops, woodland trails, guided corrections, saved progress, campfire keepsakes, and parent reports.
 
-Sumtrail is a sibling of [Keytrail](https://github.com/jlevins2011/typing-game) (typing) and [Camp Compass](https://github.com/jlevins2011/state-capitals) (US geography). It uses the same forest-camp branding: **Pip the lantern fox**, fox-coat kid profiles, and grown-up reports. Maggie the beagle from the family’s other homeschool games makes a cameo when a trail gets bumpy.
+Play: https://jlevins2011.github.io/sumtrail/
 
-The fox, writing, UI, and fact tips were made for this project. There is no Minecraft, Mario, or other licensed IP.
+## Learn and explore
 
-## Play
+- **Ember Grove:** build stone groups for addition and send stones downstream for subtraction within 10.
+- **Pine Bridge:** extend addition and subtraction to 20.
+- **Multiplying Meadow:** plant equal rows and explore tables 0–12.
+- **Division Hollow:** share berries equally among baskets.
+- **Night Sum Summit:** explore all four operations and finish an 85% mixed fluency gate.
 
-Live (after Pages is enabled): [https://jlevins2011.github.io/sumtrail/](https://jlevins2011.github.io/sumtrail/)
+Workshops are untimed exploration. Their models do not award stars or affect reports. Scored trails use independent first answers; mistakes can be rebuilt in a visual model and retried. Successful corrections are recorded separately and never inflate accuracy. Kids can move on without being trapped in a retry.
 
-Pushes to `main` build the game and publish that URL. GitHub Pages must serve the **`gh-pages`** branch (folder `/`), not the source on `main`.
+Pip travels across the lantern bridge as answers arrive. Correct lanterns stay lit; mistakes remain marked. Campfire clears unlock five lantern styles that can be selected at camp and used on trails. Existing camp clears retain their rewards.
 
-### GitHub Pages setup
+Select a starting grade when adding a child. Earlier camps remain available for review; later scored trails unlock sequentially. `?demo=1` limits the game to Ember Grove.
 
-1. Repo **Settings → Pages**.
-2. Source: **Deploy from a branch**.
-3. Branch: **`gh-pages`**, folder **`/`**.
-4. Save. The first successful push to `main` (or **Actions → Deploy GitHub Pages → Run workflow**) publishes the site.
+## Saving and accessibility
 
-The workflow in `.github/workflows/pages.yml` matches Keytrail: `npm ci`, `npm test`, `npm run build` with `GITHUB_PAGES=true` (base path `/sumtrail/`), then `peaceiris/actions-gh-pages` publishes `./dist`.
+Each child and lesson has an independent saved trail: question deck, partial input, answer history, visual-correction state, and active practice time. Open that trail to resume paused. Normal navigation and page hiding save immediately; unexpected process termination can lose up to one second of timing. The game reports storage failures rather than claiming a successful save.
 
-```bash
-npm install
+Pause with the button or Escape; leaving the window pauses automatically. Introductions and time away do not count as practice. Keyboard and touch answers, focus indicators, reduced-motion preferences, high contrast, and sound controls are supported. Offline revisits work after the production game has loaded successfully. Fonts and artwork need no external services. The offline cache only manages Sumtrail files.
+
+## Parents and the future family website
+
+Create a four-digit local parent PIN to view operation accuracy, corrections, starting grade, practice time, weak facts, and session history. Reports can be printed or the selected child's retained learning records downloaded as JSON. Local storage retains up to 200 sessions per child.
+
+The PIN discourages accidental entry; it is not account security. There is no shared sign-in or cloud synchronization yet. The versioned learning-receipt boundary prepares for the family website without claiming that browser data can authorize Lumen Isles spending. Old local credit records are preserved, but new campfires award usable lantern styles instead of writing cross-game credits. See [the integration contract](docs/FAMILY-PLATFORM.md).
+
+## Develop and verify
+
+```
+npm ci
+npm test
 npm run dev
 ```
 
-Then open the local URL Vite prints (usually `http://localhost:5173`).
+`npm run build` runs TypeScript checks and creates the static production build. Set `GITHUB_PAGES=true` for the `/sumtrail/` deployment path. GitHub pushes to `main` run tests, build, and publish `dist` to `gh-pages`; Pages should serve that branch at `/`.
 
-```bash
-npm test
-npm run build
+The browser tests use Playwright in an isolated profile. Install Playwright separately (`npm install --no-save playwright`) and provide Chrome or `PLAYWRIGHT_CHROMIUM_EXECUTABLE`. Run the production preview with `GITHUB_PAGES=true` after a Pages build, then run:
+
+```
+SUMTRAIL_TEST_URL=http://127.0.0.1:4173/sumtrail/ node tests/browser-smoke.cjs
+SUMTRAIL_TEST_URL=http://127.0.0.1:4173/sumtrail/ node tests/expedition-browser.cjs
 ```
 
-Progress lives in this browser (`localStorage`). There is no account and no network requirement after the page loads. The app ships a small PWA shell (`manifest.json` + offline cache) so a second visit can still open the last loaded trail.
+`PLAYWRIGHT_MODULE` may point to an existing Playwright installation. The expedition browser suite requires the production service worker for its offline check. Screenshots are written to the operating-system temporary directory.
 
-## How kids learn
+Unit tests cover curriculum, mathematical models (including zero and equal division), scoring, grade gates, saves, clocks, keepsakes, receipt identity, sound cancellation, and offline cache isolation. Browser tests cover the complete first trail, mistakes and correction, pause/reload, later operations, all workshops, real campfire rewards, journal practice, parent export, settings, small screens, and offline reload.
 
-At profile setup (or a one-time “Where should we start?” screen), pick a grade so the trail does not always begin in Ember Grove:
+## Original assets
 
-1. **K–1 → Ember Grove** — add and subtract within 10.
-2. **Grade 2 → Pine Bridge** — add and subtract within 20.
-3. **Grade 3 → Multiplying Meadow** — × tables 0–12, starting with 2, 5, and 10, then expanding.
-4. **Grade 4 → Division Hollow** — related ÷ facts.
-5. **Grade 5+ → Night Sum Summit** — mixed fluency, with an 85% proficiency gate.
-
-Every camp at or below the chosen start stays open for review. Later camps still unlock in order after a campfire clear. Change the starting grade anytime in Settings. Parent reports show the chosen grade and camp.
-
-Each round is timed-but-kind: a lantern slowly dims, but Pip just waits. Correct answers light a lantern and drop a one-line number-sense tip in the journal. Misses show the right answer plus the tip, then move on — kids are not trapped. Stars reward smoothness and accuracy.
-
-## Demo vs full (future hub)
-
-Add `?demo=1` to the URL to play **Ember Grove only** (handy for a future Foxtrail Family hub teaser):
-
-`https://jlevins2011.github.io/sumtrail/?demo=1`
-
-The hub can later unlock later camps and share question banks (math fact lists). Sumtrail keeps stub types in `src/lib/hub.ts` and does **not** need the hub to play.
-
-## Parents
-
-Set a 4-digit PIN on first visit. Reports show the chosen starting grade/camp, facts practiced, accuracy by operation, streak, time-on-task, trail stars, and a printable session history. Data stays on the device.
-
-## Cross-game credits (stub)
-
-When a camp is first cleared, Sumtrail writes an earn event to the shared namespace:
-
-- Key: `foxtrail.credits.v1`
-- Shape: `{ version: 1, events: [{ id, amount, source: "sumtrail", campId, childId, at }] }`
-- Amounts: Ember Grove 15 · Pine Bridge 20 · Multiplying Meadow 25 · Division Hollow 25 · Night Sum Summit 40
-
-**Lumen Isles** will later spend these credits. This repo only emits earns. Keytrail, Camp Compass, Lumen, and the family hub are not modified here.
-
-## License
-
-All rights reserved unless you choose another license for commercialization.
+Pip, the woodland scenery, visual models, and interface are project-owned original work. No Nintendo or other licensed game characters, art, or music are used. All rights reserved unless you choose another license for commercialization.

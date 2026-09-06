@@ -1,3 +1,4 @@
+import { familyExport } from "../lib/familyServices";
 import { useMemo, useState } from "react";
 import { getLesson, LESSONS } from "../data/curriculum";
 import {
@@ -66,6 +67,11 @@ export function ParentDashboard() {
             ))}
           </div>
 
+          <button className="btn ghost print-hide" onClick={()=>{
+            const blob=new Blob([JSON.stringify(familyExport(child),null,2)],{type:'application/json'});
+            const url=URL.createObjectURL(blob); const a=document.createElement('a');
+            a.href=url;a.download='sumtrail-learning-records.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+          }}>Export this child’s learning records</button>
           <section className="parent-hero panel">
             <Pip coat={child.coat} pose="sit" size={88} />
             <div>
@@ -117,6 +123,7 @@ export function ParentDashboard() {
 
           <section className="panel">
             <h3>Accuracy by operation</h3>
+            <p className="muted">First answers only. Visual corrections and workshop exploration never increase these scores.</p>
             <table className="report-table">
               <thead>
                 <tr>
@@ -191,6 +198,7 @@ export function ParentDashboard() {
                   <th>When</th>
                   <th>Trail</th>
                   <th>Accuracy</th>
+                  <th>Corrections</th>
                   <th>Stars</th>
                 </tr>
               </thead>
@@ -200,6 +208,7 @@ export function ParentDashboard() {
                     <td>{new Date(session.startedAt).toLocaleString()}</td>
                     <td>{getLesson(session.lessonId)?.title ?? session.lessonId}</td>
                     <td>{session.accuracy}%</td>
+                    <td>{session.correctedFacts?.length ?? 0}</td>
                     <td>{session.passed ? "★".repeat(session.stars) : "retry"}</td>
                   </tr>
                 ))}
@@ -208,8 +217,7 @@ export function ParentDashboard() {
           </section>
 
           <p className="fine">
-            Sumtrail stores progress only in this browser (sumtrail.v1). Camp-clear credits land in foxtrail.credits.v1
-            for a future Lumen Isles spend. There is no account, no cloud, and no ads.
+            Progress stays on this device. Export learning records for your own backup or a future family website. Shared accounts and Lumen Isles rewards are not connected yet. Older local credit records are preserved; new campfires earn usable lantern styles.
           </p>
         </>
       )}

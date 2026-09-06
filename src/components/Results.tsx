@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { getLesson, nextLessonId, WORLDS } from "../data/curriculum";
+import { LANTERNS } from "../lib/keepsakes";
 import { sounds } from "../lib/audio";
 import { isDemoMode, isWorldPlayable } from "../lib/demo";
 import { formatDuration } from "../lib/stats";
@@ -38,7 +39,7 @@ export function Results({ lessonId, sessionId }: { lessonId: string; sessionId: 
     headline = "Summit still waiting.";
     body = `Aim for ${lesson.goals.accuracy}% accuracy. Warm up on Night warm-up, then try again.`;
   } else {
-    headline = "Pip stumbled, not you.";
+    headline = "A little practice, a brighter path.";
     body = `Try to land ${lesson.goals.accuracy}% accuracy. The trail does not go anywhere.`;
   }
 
@@ -52,7 +53,7 @@ export function Results({ lessonId, sessionId }: { lessonId: string; sessionId: 
       <p className="lede">{body}</p>
       {campJustCleared && (
         <p className="credit-toast">
-          Camp cleared! +{world?.creditAmount ?? 0} Foxtrail credits stored for Lumen Isles later.
+          Campfire earned! {LANTERNS.find(l=>l.camp===lesson.worldId)?.name} is available at camp.
         </p>
       )}
       <div className="star-row" aria-label={`${session.stars} stars`}>
@@ -65,7 +66,7 @@ export function Results({ lessonId, sessionId }: { lessonId: string; sessionId: 
       <div className="stat-grid">
         <div>
           <b>{session.accuracy}%</b>
-          <span>accuracy</span>
+          <span>first-answer accuracy</span>
         </div>
         <div>
           <b>{session.correct}</b>
@@ -80,10 +81,12 @@ export function Results({ lessonId, sessionId }: { lessonId: string; sessionId: 
           <span>time</span>
         </div>
       </div>
+      {!!session.correctedFacts?.length && <p className="correction-summary">You worked through {session.correctedFacts.length} fact{session.correctedFacts.length===1?'':'s'} with help. Those corrections are recorded separately from your first answers.</p>}
       <div className="row-actions">
         <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "map" } })}>
           Camps
         </button>
+        <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "workshop", worldId:lesson.worldId } })}>Practice in the workshop</button>
         <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "lesson", lessonId } })}>
           Try again
         </button>

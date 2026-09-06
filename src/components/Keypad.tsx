@@ -15,14 +15,14 @@ export function Keypad({
       {keys.map((key) => {
         if (key === "back") {
           return (
-            <button key={key} type="button" className="pad-key ghost" disabled={disabled} onClick={onBackspace}>
+            <button key={key} type="button" aria-label="Erase last digit" className="pad-key ghost" disabled={disabled} onClick={onBackspace}>
               ⌫
             </button>
           );
         }
         if (key === "go") {
           return (
-            <button key={key} type="button" className="pad-key go" disabled={disabled} onClick={onSubmit}>
+            <button key={key} type="button" aria-label="Check answer" className="pad-key go" disabled={disabled} onClick={onSubmit}>
               ✓
             </button>
           );

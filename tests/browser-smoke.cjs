@@ -1,0 +1,87 @@
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const os = require('node:os');
+(async () => {
+  const browser = await chromium.launch({headless:true, executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+  try {
+    const page = await browser.newPage({viewport:{width:1280,height:1000}});
+    const errors=[]; page.on('pageerror',e=>errors.push(e.message));
+    await page.goto(process.env.SUMTRAIL_TEST_URL || 'http://127.0.0.1:5176');
+    await page.getByRole('button',{name:'Start adventure',exact:true}).click();
+    await page.getByLabel('First name').fill('Scout');
+    await page.getByRole('button',{name:'Let’s go',exact:true}).click();
+    await page.getByRole('button',{name:'Continue',exact:true}).click();
+    await page.waitForTimeout(1200);
+    const start=Date.now();
+    await page.getByRole('button',{name:'Start trail',exact:true}).click();
+    const originalPrompt = await page.locator('.fact-prompt').textContent();
+    await page.keyboard.type('7');
+    await page.reload();
+    await page.getByRole('button',{name:'Play',exact:true}).click();
+    await page.locator('.profile-card').filter({hasText:'Scout'}).click();
+    await page.getByRole('button',{name:'Continue',exact:true}).click();
+    await page.getByRole('dialog').waitFor();
+    assert.equal(await page.locator('.fact-prompt').textContent(),originalPrompt);
+    assert.equal((await page.locator('.answer-box').textContent()).trim(),'7');
+    await page.getByRole('button',{name:'Continue trail',exact:true}).click();
+    await page.keyboard.press('Backspace');
+    await page.keyboard.down('1'); await page.keyboard.down('1'); await page.keyboard.up('1');
+    assert.equal((await page.locator('.answer-box').textContent()).trim(),'1');
+    await page.keyboard.press('Backspace');
+    await page.keyboard.press('Control+2');
+    assert.equal((await page.locator('.answer-box').textContent()).trim(),'');
+    await page.getByRole('button',{name:'Pause',exact:true}).click();
+    const timer=await page.locator('.kind-bar span').getAttribute('style');
+    await page.waitForTimeout(1500);
+    assert.equal(await page.locator('.kind-bar span').getAttribute('style'),timer);
+    await page.keyboard.press('9');
+    assert.equal((await page.locator('.answer-box').textContent()).trim(),'');
+    await page.getByRole('button',{name:'Continue trail',exact:true}).click();
+    await page.keyboard.type('999'); await page.getByRole('button',{name:'Check answer'}).click();
+    assert.equal(await page.locator('[data-outcome="review"]').count(),1);
+    await page.reload();
+    await page.getByRole('button',{name:'Play',exact:true}).click();
+    await page.locator('.profile-card').filter({hasText:'Scout'}).click();
+    await page.getByRole('button',{name:'Continue',exact:true}).click();
+    await page.getByRole('button',{name:'Continue trail',exact:true}).click();
+    assert.equal(await page.locator('[data-outcome="review"]').count(),1);
+    assert.match(await page.locator('.feedback-line').textContent(), /The path says/);
+    await page.getByRole('button',{name:'Work it out together'}).click();
+    if (await page.getByRole('button',{name:'Bring one stone'}).count()) await page.getByRole('button',{name:'Bring one stone'}).click();
+    const correctionAnswer = (await page.locator('.feedback-line').textContent()).match(/= (\d+)/)[1];
+    await page.getByLabel('Try this fact again').fill(correctionAnswer);
+    await page.getByRole('button',{name:'Check correction'}).click();
+    await page.getByText('✓ Worked out together').waitFor();
+    await page.getByRole('button',{name:'Next lantern'}).click();
+    let answered=1;
+    while (await page.locator('.fact-prompt').count()) {
+      const prompt=await page.locator('.fact-prompt').textContent();
+      const [a,op,b]=prompt.trim().split(/\s+/);
+      const n=op==='+'? +a + +b : op==='−'||op==='-'? +a - +b : op==='×'? +a * +b : +a / +b;
+      await page.keyboard.type(String(n)); await page.getByRole('button',{name:'Check answer'}).click();
+      answered++;
+      if(answered===3) {
+        assert.equal(await page.locator('[data-outcome="review"]').count(),1);
+        assert.equal(await page.locator('[data-outcome="lit"]').count(),2);
+        await page.waitForTimeout(800);
+        await page.screenshot({path:path.join(os.tmpdir(),'sumtrail-crossing.png'),fullPage:true});
+        await page.setViewportSize({width:390,height:844});
+        assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+        await page.screenshot({path:path.join(os.tmpdir(),'sumtrail-mobile.png'),fullPage:true});
+      }
+      await page.getByRole('button',{name:/Next lantern|See camp stars/}).click();
+    }
+    const data=await page.evaluate(()=>JSON.parse(localStorage.getItem('sumtrail.v1')));
+    assert.equal(data.children[0].sessions.length,1);
+    assert.equal(await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith("sumtrail.trail.")).length),0);
+    const session=data.children[0].sessions[0];
+    assert.equal(session.correctedFacts.length,1);
+    assert.equal(session.errors,1); assert.equal(session.correct,answered-1);
+    assert(session.durationMs < Date.now()-start-1000);
+    await page.reload();
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('sumtrail.v1')).children[0].sessions.length),1);
+    assert.deepEqual(errors,[]);
+    console.log('PASS: full round, correction history, keyboard guards, pause timing, save/reload, mobile overflow.');
+  } finally { await browser.close(); }
+})().catch(e=>{console.error(e);process.exit(1)});

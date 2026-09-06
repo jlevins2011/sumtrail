@@ -1,3 +1,4 @@
+import { Workshop } from "./components/Workshop";
 import { Journal } from "./components/Journal";
 import { LessonView } from "./components/LessonView";
 import { ParentDashboard } from "./components/ParentDashboard";
@@ -20,7 +21,8 @@ export function App() {
       {view.name === "profiles" && <ProfileSelect />}
       {view.name === "start-level" && <StartLevelScreen />}
       {view.name === "map" && <TrailMap />}
-      {view.name === "lesson" && <LessonView lessonId={view.lessonId} />}
+      {view.name === "workshop" && <Workshop key={view.worldId} worldId={view.worldId} />}
+      {view.name === "lesson" && <LessonView key={view.lessonId} lessonId={view.lessonId} />}
       {view.name === "results" && <Results lessonId={view.lessonId} sessionId={view.sessionId} />}
       {view.name === "parent-gate" && <ParentGate />}
       {view.name === "parent" && <ParentDashboard />}
