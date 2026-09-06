@@ -1,5 +1,8 @@
 export type Coat = "ember" | "snow" | "dusk" | "moss";
 
+/** School-year band used to pick a starting camp. */
+export type GradeBand = "k-1" | "2" | "3" | "4" | "5+";
+
 export type Operation = "add" | "sub" | "mul" | "div";
 
 export type LessonKind = "guide" | "drill" | "mix" | "exam";
@@ -9,6 +12,7 @@ export type Mood = "dawn" | "day" | "dusk" | "fire" | "night";
 export type View =
   | { name: "title" }
   | { name: "profiles" }
+  | { name: "start-level" }
   | { name: "map" }
   | { name: "lesson"; lessonId: string }
   | { name: "results"; lessonId: string; sessionId: string }
@@ -109,6 +113,10 @@ export type Child = {
   factsFound: string[];
   journal: JournalEntry[];
   campsCleared: string[];
+  /** Grade band chosen at setup; missing on profiles created before start-level. */
+  gradeBand?: GradeBand;
+  /** Camp id to begin at; camps at or below this stay open for review. */
+  startWorldId?: string;
 };
 
 export type Settings = {

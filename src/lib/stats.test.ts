@@ -43,6 +43,27 @@ describe("stats", () => {
     expect(isLessonUnlocked(child, "pine-ten", false)).toBe(false);
   });
 
+  it("opens every camp at or below a chosen start, and keeps later camps sequential", () => {
+    const child = createChild("Drew", "dusk", "3");
+    expect(isLessonUnlocked(child, "ember-meet", false)).toBe(true);
+    expect(isLessonUnlocked(child, "ember-clear", false)).toBe(true);
+    expect(isLessonUnlocked(child, "pine-ten", false)).toBe(true);
+    expect(isLessonUnlocked(child, "meadow-easy", false)).toBe(true);
+    expect(isLessonUnlocked(child, "meadow-clear", false)).toBe(false);
+    expect(isLessonUnlocked(child, "hollow-easy", false)).toBe(false);
+    expect(recommendedLessonId(child, false)).toBe("meadow-easy");
+  });
+
+  it("opens Night Sum for Grade 5+ while demo still stays in Ember Grove", () => {
+    const child = createChild("Eli", "moss", "5+");
+    expect(isLessonUnlocked(child, "summit-warm", false)).toBe(true);
+    expect(isLessonUnlocked(child, "hollow-easy", false)).toBe(true);
+    expect(recommendedLessonId(child, false)).toBe("summit-warm");
+    expect(isLessonUnlocked(child, "pine-ten", true)).toBe(false);
+    expect(isLessonUnlocked(child, "ember-meet", true)).toBe(true);
+    expect(recommendedLessonId(child, true)).toBe("ember-meet");
+  });
+
   it("finishing Ember Grove is 100% in demo and unlocks Pine Bridge in full play", () => {
     const child = createChild("Bea", "snow");
     for (const lesson of LESSONS.filter((item) => item.worldId === "ember-grove")) {

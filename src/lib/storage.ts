@@ -1,5 +1,6 @@
-import type { Child, JournalEntry, LessonRecord, Session, Settings, StoreData } from "../types";
+import type { Child, GradeBand, JournalEntry, LessonRecord, Session, Settings, StoreData } from "../types";
 import { OPERATIONS } from "../types";
+import { getWorldOrder, isGradeBand, startLevelFor } from "./startLevel";
 
 export const STORE_KEY = "sumtrail.v1";
 
@@ -40,6 +41,7 @@ export function loadStore(): StoreData {
 }
 
 function normalizeChild(child: Child): Child {
+  const gradeBand = isGradeBand(child.gradeBand) ? child.gradeBand : undefined;
   return {
     ...child,
     factsFound: child.factsFound ?? [],
@@ -47,6 +49,13 @@ function normalizeChild(child: Child): Child {
     campsCleared: child.campsCleared ?? [],
     sessions: child.sessions ?? [],
     completedLessons: child.completedLessons ?? {},
+    gradeBand,
+    startWorldId:
+      child.startWorldId && getWorldOrder(child.startWorldId) >= 0
+        ? child.startWorldId
+        : gradeBand
+          ? startLevelFor(gradeBand).campId
+          : undefined,
   };
 }
 
@@ -68,7 +77,8 @@ export function newId(): string {
   return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-export function createChild(name: string, coat: Child["coat"]): Child {
+export function createChild(name: string, coat: Child["coat"], gradeBand: GradeBand = "k-1"): Child {
+  const level = startLevelFor(gradeBand);
   return {
     id: newId(),
     name: name.trim() || "Explorer",
@@ -79,6 +89,8 @@ export function createChild(name: string, coat: Child["coat"]): Child {
     factsFound: [],
     journal: [],
     campsCleared: [],
+    gradeBand: level.gradeBand,
+    startWorldId: level.campId,
   };
 }
 

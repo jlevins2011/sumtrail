@@ -1,4 +1,6 @@
+import { describeStartLevel, resolveStartLevel } from "../lib/startLevel";
 import { useActiveChild, useStore } from "../store/StoreContext";
+import { StartLevelPicker } from "./StartLevelPicker";
 
 export function Settings() {
   const { state, dispatch } = useStore();
@@ -11,6 +13,17 @@ export function Settings() {
       </button>
       <h1>Settings</h1>
       {child && <p className="lede">Playing as {child.name}.</p>}
+      {child && (
+        <div className="panel form start-level-panel">
+          <p className="label">Starting grade</p>
+          <p className="tip">Camps at or below this stay open for review. Later camps still unlock in order.</p>
+          <StartLevelPicker
+            value={resolveStartLevel(child).gradeBand}
+            onChange={(gradeBand) => dispatch({ type: "set-start-level", id: child.id, gradeBand })}
+          />
+          <p className="tip">Now starting at {describeStartLevel(child)}.</p>
+        </div>
+      )}
       <div className="panel form">
         <label className="toggle">
           <input

@@ -1,5 +1,6 @@
 import { lessonsInWorld } from "../data/curriculum";
 import { visibleWorlds } from "../lib/demo";
+import { childStartWorldId, describeStartLevel } from "../lib/startLevel";
 import { isLessonUnlocked, maxStars, progressPercent, recommendedLessonId, totalStars } from "../lib/stats";
 import { useActiveChild, useDemoFlag, useStore } from "../store/StoreContext";
 import { Pip } from "./Pip";
@@ -11,6 +12,7 @@ export function TrailMap() {
   if (!child) return null;
   const rec = recommendedLessonId(child, demo);
   const worlds = visibleWorlds(demo);
+  const startWorld = childStartWorldId(child);
 
   return (
     <div className="screen map-screen">
@@ -23,6 +25,9 @@ export function TrailMap() {
           <div>
             <h1>{child.name}’s camps</h1>
             <p>
+              Starts at {describeStartLevel(child)}
+              {demo ? " · demo keeps later camps folded" : ""}
+              {" · "}
               {progressPercent(child, demo)}% lit · {totalStars(child)}/{maxStars(demo)} stars · {child.journal.length}{" "}
               journal tips
             </p>
@@ -49,7 +54,10 @@ export function TrailMap() {
           return (
             <section key={world.id} className={`world mood-${world.mood}`}>
               <header>
-                <h2>{world.name}</h2>
+                <h2>
+                  {world.name}
+                  {!demo && world.id === startWorld ? " · starting camp" : ""}
+                </h2>
                 <p>{world.subtitle}</p>
               </header>
               <ol className="nodes">

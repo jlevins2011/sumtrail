@@ -14,7 +14,8 @@ import {
   newId,
   saveStore,
 } from "../lib/storage";
-import type { Coat, JournalEntry, Operation, Settings, StoreData, View } from "../types";
+import { hasChosenStartLevel, startLevelFor } from "../lib/startLevel";
+import type { Coat, GradeBand, JournalEntry, Operation, Settings, StoreData, View } from "../types";
 import { MAX_PROFILES } from "../types";
 
 export type RecordSessionPayload = {
@@ -34,8 +35,9 @@ export type RecordSessionPayload = {
 type Action =
   | { type: "hydrate"; data: StoreData }
   | { type: "go"; view: View }
-  | { type: "add-child"; name: string; coat: Coat }
+  | { type: "add-child"; name: string; coat: Coat; gradeBand: GradeBand }
   | { type: "select-child"; id: string }
+  | { type: "set-start-level"; id: string; gradeBand: GradeBand }
   | { type: "delete-child"; id: string }
   | { type: "set-pin"; pin: string }
   | { type: "clear-pin" }
@@ -52,7 +54,7 @@ function reducer(state: State, action: Action): State {
       return { ...state, view: action.view };
     case "add-child": {
       if (state.children.length >= MAX_PROFILES) return state;
-      const child = createChild(action.name, action.coat);
+      const child = createChild(action.name, action.coat, action.gradeBand);
       return {
         ...state,
         children: [...state.children, child],
@@ -60,8 +62,27 @@ function reducer(state: State, action: Action): State {
         view: { name: "map" },
       };
     }
-    case "select-child":
-      return { ...state, activeChildId: action.id, view: { name: "map" } };
+    case "select-child": {
+      const child = state.children.find((item) => item.id === action.id);
+      const needsPlacement = child ? !hasChosenStartLevel(child) : false;
+      return {
+        ...state,
+        activeChildId: action.id,
+        view: { name: needsPlacement ? "start-level" : "map" },
+      };
+    }
+    case "set-start-level": {
+      const level = startLevelFor(action.gradeBand);
+      return {
+        ...state,
+        children: state.children.map((child) =>
+          child.id === action.id
+            ? { ...child, gradeBand: level.gradeBand, startWorldId: level.campId }
+            : child,
+        ),
+        view: state.view.name === "start-level" ? { name: "map" } : state.view,
+      };
+    }
     case "delete-child": {
       const children = state.children.filter((child) => child.id !== action.id);
       const activeChildId =
