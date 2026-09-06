@@ -37,13 +37,17 @@ Progress lives in this browser (`localStorage`). There is no account and no netw
 
 ## How kids learn
 
-1. **Ember Grove** — add and subtract within 10.
-2. **Pine Bridge** — add and subtract within 20.
-3. **Multiplying Meadow** — × tables 0–12, starting with 2, 5, and 10, then expanding.
-4. **Division Hollow** — related ÷ facts.
-5. **Night Sum Summit** — mixed fluency, with an 85% proficiency gate.
+At profile setup (or a one-time “Where should we start?” screen), pick a grade so the trail does not always begin in Ember Grove:
 
-Each round is timed-but-kind: a lantern slowly dims, but Pip just waits. Correct answers light a lantern and drop a one-line number-sense tip in the journal. Misses show the right answer plus the tip, then move on — kids are not trapped. Stars reward smoothness and accuracy. Camps unlock in order.
+1. **K–1 → Ember Grove** — add and subtract within 10.
+2. **Grade 2 → Pine Bridge** — add and subtract within 20.
+3. **Grade 3 → Multiplying Meadow** — × tables 0–12, starting with 2, 5, and 10, then expanding.
+4. **Grade 4 → Division Hollow** — related ÷ facts.
+5. **Grade 5+ → Night Sum Summit** — mixed fluency, with an 85% proficiency gate.
+
+Every camp at or below the chosen start stays open for review. Later camps still unlock in order after a campfire clear. Change the starting grade anytime in Settings. Parent reports show the chosen grade and camp.
+
+Each round is timed-but-kind: a lantern slowly dims, but Pip just waits. Correct answers light a lantern and drop a one-line number-sense tip in the journal. Misses show the right answer plus the tip, then move on — kids are not trapped. Stars reward smoothness and accuracy.
 
 ## Demo vs full (future hub)
 
@@ -55,7 +59,7 @@ The hub can later unlock later camps and share question banks (math fact lists).
 
 ## Parents
 
-Set a 4-digit PIN on first visit. Reports show facts practiced, accuracy by operation, streak, time-on-task, trail stars, and a printable session history. Data stays on the device.
+Set a 4-digit PIN on first visit. Reports show the chosen starting grade/camp, facts practiced, accuracy by operation, streak, time-on-task, trail stars, and a printable session history. Data stays on the device.
 
 ## Cross-game credits (stub)
 

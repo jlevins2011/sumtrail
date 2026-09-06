@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { DEFAULT_GRADE_BAND, resolveStartLevel } from "../lib/startLevel";
 import { useStore } from "../store/StoreContext";
-import { MAX_PROFILES, type Coat } from "../types";
+import { MAX_PROFILES, type Coat, type GradeBand } from "../types";
 import { COAT_OPTIONS, Pip } from "./Pip";
+import { StartLevelPicker } from "./StartLevelPicker";
 
 export function ProfileSelect() {
   const { state, dispatch } = useStore();
   const [name, setName] = useState("");
   const [coat, setCoat] = useState<Coat>("ember");
+  const [gradeBand, setGradeBand] = useState<GradeBand>(DEFAULT_GRADE_BAND);
   const [adding, setAdding] = useState(state.children.length === 0);
   const atCap = state.children.length >= MAX_PROFILES;
 
@@ -28,6 +31,7 @@ export function ProfileSelect() {
             >
               <Pip coat={child.coat} pose="idle" size={88} />
               <strong>{child.name}</strong>
+              <span className="profile-start">{resolveStartLevel(child).campName}</span>
             </button>
           ))}
           {!atCap && (
@@ -43,11 +47,12 @@ export function ProfileSelect() {
 
       {(adding || state.children.length === 0) && (
         <form
-          className="panel form"
+          className="panel form start-level-panel"
           onSubmit={(e) => {
             e.preventDefault();
-            dispatch({ type: "add-child", name, coat });
+            dispatch({ type: "add-child", name, coat, gradeBand });
             setName("");
+            setGradeBand(DEFAULT_GRADE_BAND);
             setAdding(false);
           }}
         >
@@ -61,6 +66,8 @@ export function ProfileSelect() {
               placeholder="Pip’s friend"
             />
           </label>
+          <p className="label">Where should we start?</p>
+          <StartLevelPicker value={gradeBand} onChange={setGradeBand} />
           <p className="label">Fox coat</p>
           <div className="coat-row">
             {COAT_OPTIONS.map((opt) => (

@@ -22,6 +22,30 @@ describe("storage", () => {
     expect(loaded.children[0].name).toBe("Pip’s pal");
     expect(loaded.children[0].journal).toEqual([]);
     expect(loaded.children[0].campsCleared).toEqual([]);
+    expect(loaded.children[0].gradeBand).toBe("k-1");
+    expect(loaded.children[0].startWorldId).toBe("ember-grove");
+  });
+
+  it("persists a chosen starting camp on the profile", () => {
+    const data = emptyStore();
+    const child = createChild("Fourth", "moss", "4");
+    data.children.push(child);
+    saveStore(data);
+    const loaded = loadStore();
+    expect(loaded.children[0].gradeBand).toBe("4");
+    expect(loaded.children[0].startWorldId).toBe("division-hollow");
+  });
+
+  it("keeps legacy profiles without a start level unset", () => {
+    const data = emptyStore();
+    const child = createChild("Old", "ember");
+    delete child.gradeBand;
+    delete child.startWorldId;
+    data.children.push(child);
+    saveStore(data);
+    const loaded = loadStore();
+    expect(loaded.children[0].gradeBand).toBeUndefined();
+    expect(loaded.children[0].startWorldId).toBeUndefined();
   });
 
   it("recovers from junk localStorage", () => {

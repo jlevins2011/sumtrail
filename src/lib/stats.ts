@@ -1,5 +1,6 @@
-import { LESSONS, previousLessonId } from "../data/curriculum";
-import { isWorldPlayable } from "./demo";
+import { LESSONS, lessonsInWorld, previousLessonId } from "../data/curriculum";
+import { DEMO_WORLD_ID, isWorldPlayable } from "./demo";
+import { childStartWorldId, getWorldOrder } from "./startLevel";
 import type { Child, Operation, Session } from "../types";
 import { OPERATIONS } from "../types";
 
@@ -7,6 +8,15 @@ export function isLessonUnlocked(child: Child, lessonId: string, demo = false): 
   const lesson = LESSONS.find((item) => item.id === lessonId);
   if (!lesson) return false;
   if (!isWorldPlayable(lesson.worldId, demo)) return false;
+
+  if (!demo) {
+    const startWorld = childStartWorldId(child);
+    const worldIndex = getWorldOrder(lesson.worldId);
+    const startIndex = getWorldOrder(startWorld);
+    if (worldIndex >= 0 && startIndex >= 0 && worldIndex < startIndex) return true;
+    if (worldIndex === startIndex && lessonsInWorld(lesson.worldId)[0]?.id === lesson.id) return true;
+  }
+
   if (lesson.number === 1) return true;
   const prev = previousLessonId(lessonId);
   if (!prev) return true;
@@ -19,11 +29,14 @@ export function isLessonUnlocked(child: Child, lessonId: string, demo = false): 
 
 export function recommendedLessonId(child: Child, demo = false): string {
   const playable = LESSONS.filter((lesson) => isWorldPlayable(lesson.worldId, demo));
-  for (const lesson of playable) {
+  const startWorld = demo ? DEMO_WORLD_ID : childStartWorldId(child);
+  const startIndex = playable.findIndex((lesson) => lesson.worldId === startWorld);
+  const fromStart = startIndex >= 0 ? playable.slice(startIndex) : playable;
+  for (const lesson of fromStart) {
     const record = child.completedLessons[lesson.id];
     if (!record || record.stars < 1) return lesson.id;
   }
-  return playable[playable.length - 1]?.id ?? LESSONS[0].id;
+  return fromStart[fromStart.length - 1]?.id ?? playable[playable.length - 1]?.id ?? LESSONS[0].id;
 }
 
 export function progressPercent(child: Child, demo = false): number {

@@ -15,6 +15,7 @@ import {
   uniqueFactsPracticed,
   weakFacts,
 } from "../lib/stats";
+import { describeStartLevel, hasChosenStartLevel } from "../lib/startLevel";
 import { useStore } from "../store/StoreContext";
 import type { Operation } from "../types";
 import { Pip } from "./Pip";
@@ -70,6 +71,8 @@ export function ParentDashboard() {
             <div>
               <h2>{child.name}</h2>
               <p>
+                Starts at {hasChosenStartLevel(child) ? describeStartLevel(child) : "Ember Grove (not set yet)"}
+                {" · "}
                 {progressPercent(child)}% of Sumtrail complete
                 {isNightSumKeeper(child) ? " · Night Sum keeper" : ""}
                 {child.campsCleared.length ? ` · ${child.campsCleared.length} camps cleared` : ""}
