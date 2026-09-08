@@ -17,6 +17,7 @@ const base=process.env.SUMTRAIL_TEST_URL||'http://127.0.0.1:5178/sumtrail/';
   if(demo) await page.locator('.start-level-pick').last().click();
   await page.getByRole('button',{name:'Let’s go',exact:true}).click();
   await page.getByRole('heading',{name:'Light your first 6 lanterns.'}).waitFor();
+  assert.equal(await page.evaluate(()=>window.scrollY),0);
   if(demo)assert.equal(await page.locator('.world').count(),1);
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.screenshot({path:path.join(os.tmpdir(),`sumtrail-first-map-${demo}.png`),fullPage:false});

@@ -1,3 +1,4 @@
+import { useLayoutEffect } from "react";
 import { Workshop } from "./components/Workshop";
 import { Journal } from "./components/Journal";
 import { LessonView } from "./components/LessonView";
@@ -14,6 +15,7 @@ import { useStore } from "./store/StoreContext";
 export function App() {
   const { state } = useStore();
   const view = state.view;
+  useLayoutEffect(() => { window.scrollTo(0, 0); }, [view]);
 
   return (
     <div className={`app ${state.settings.highContrast ? "contrast" : ""}`}>
