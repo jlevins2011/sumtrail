@@ -9,7 +9,7 @@ export function StartLevelPicker({
   onChange: (gradeBand: GradeBand) => void;
 }) {
   return (
-    <div className="start-level-list" role="radiogroup" aria-label="Starting grade or camp">
+    <><p className="tip">Choose the facts your child needs. These are practice levels, not a full grade curriculum. Kindergarten fluency is within 5; Ember Grove starts there and grows to Grade 1 facts within 10. Tables through 12 are extensions. Older learners can choose mixed review.</p><div className="start-level-list" role="radiogroup" aria-label="Starting practice or camp">
       {START_LEVELS.map((level) => (
         <button
           key={level.gradeBand}
@@ -24,6 +24,6 @@ export function StartLevelPicker({
           <small>{level.blurb}</small>
         </button>
       ))}
-    </div>
+    </div></>
   );
 }

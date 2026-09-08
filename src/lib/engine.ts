@@ -1,3 +1,4 @@
+import { thinkingWindowMs } from "./pacing";
 import type { Lesson } from "../types";
 
 export function accuracyOf(correct: number, errors: number): number {
@@ -28,7 +29,7 @@ export function evaluateRound(
   responseMs: number[],
 ): { accuracy: number; stars: number; passed: boolean; smoothness: number } {
   const accuracy = accuracyOf(correct, errors);
-  const smoothness = smoothnessScore(responseMs);
+  const smoothness = smoothnessScore(responseMs, thinkingWindowMs(lesson));
   const finished = correct + errors >= lesson.questionCount;
   const passed = finished && accuracy >= lesson.goals.accuracy;
   return {

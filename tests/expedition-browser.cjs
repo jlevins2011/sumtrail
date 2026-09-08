@@ -31,7 +31,21 @@ const answer=prompt=>{const [a,op,b]=prompt.trim().split(/\s+/);return op==='+'?
   // Complete actual subtraction, multiplication and division rounds.
   for(const title of ['Take-away ferns','Skip-count clover','Fair shares']){
     await page.locator('.node').filter({hasText:title}).click();
+    if(title==='Fair shares') {
+      await page.getByText(/thinking glow fades gently over 30 seconds/).waitFor();
+      await page.clock.install();
+    }
     await page.getByRole('button',{name:'Start trail',exact:true}).click();
+    if(title==='Fair shares') {
+      await page.clock.fastForward(13000);
+      const width=await page.locator('.kind-bar span').evaluate(el=>parseFloat(el.style.width));
+      assert(width>45&&width<65,`Expected a still-lit division glow, got ${width}`);
+      await page.getByRole('button',{name:'Pause',exact:true}).click();
+      const frozen=await page.locator('.kind-bar span').getAttribute('style');
+      await page.waitForTimeout(300);
+      assert.equal(await page.locator('.kind-bar span').getAttribute('style'),frozen);
+      await page.getByRole('button',{name:'Continue trail',exact:true}).click();
+    }
     while(await page.locator('.fact-prompt').count()){
       const n=answer(await page.locator('.fact-prompt').textContent());
       for(const digit of String(n)) await page.getByRole('button',{name:digit,exact:true}).click();

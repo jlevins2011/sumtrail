@@ -15,7 +15,7 @@ export function Settings() {
       {child && <p className="lede">Playing as {child.name}.</p>}
       {child && (
         <div className="panel form start-level-panel">
-          <p className="label">Starting grade</p>
+          <p className="label">Starting practice</p>
           <p className="tip">Camps at or below this stay open for review. Later camps still unlock in order.</p>
           <StartLevelPicker
             value={resolveStartLevel(child).gradeBand}

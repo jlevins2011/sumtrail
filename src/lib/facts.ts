@@ -124,12 +124,22 @@ export function candidatesFor(bank: FactBank): Fact[] {
   return facts;
 }
 
+export function isCorePractice(f: Fact): boolean {
+  return f.a > 0 && f.b > 0 && (f.op === 'add' || f.op === 'sub' && f.answer > 0 || f.op === 'mul' && f.a > 1 && f.b > 1 || f.op === 'div' && f.b > 1 && f.answer > 1);
+}
+
 export function buildRound(bank: FactBank, count: number, rand: () => number = Math.random): Fact[] {
   const pool = candidatesFor(bank);
   if (pool.length === 0) return [];
   const picked: Fact[] = [];
   while (picked.length < count) {
-    const batch = shuffle(pool, rand);
+    const core = shuffle(pool.filter(isCorePractice), rand);
+    const identities = shuffle(pool.filter(f => !isCorePractice(f)), rand);
+    // Dedicated zero/one banks are lessons in their own right. Otherwise give
+    // meaningful work first and reserve at most one slot in eight for identities.
+    const remaining = count - picked.length;
+    const identitySlots = Math.floor(count / 8);
+    const batch = core.length ? [...core.slice(0, Math.max(remaining - identitySlots, 1)), ...identities.slice(0, identitySlots)] : identities;
     for (const fact of batch) {
       if (picked.length >= count) break;
       const last = picked[picked.length - 1];

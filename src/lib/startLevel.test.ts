@@ -28,7 +28,7 @@ describe("start level", () => {
     const child = createChild("Nia", "dusk", "3");
     expect(hasChosenStartLevel(child)).toBe(true);
     expect(childStartWorldId(child)).toBe("multiplying-meadow");
-    expect(describeStartLevel(child)).toBe("Grade 3 · Multiplying Meadow");
+    expect(describeStartLevel(child)).toBe("Grade 3 · multiplication · Multiplying Meadow");
     expect(resolveStartLevel({}).campId).toBe("ember-grove");
   });
 });

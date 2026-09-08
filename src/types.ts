@@ -1,6 +1,6 @@
 export type Coat = "ember" | "snow" | "dusk" | "moss";
 
-/** School-year band used to pick a starting camp. */
+/** Legacy storage keys for starting practice. These are not the child’s actual school grade. */
 export type GradeBand = "k-1" | "2" | "3" | "4" | "5+";
 
 export type Operation = "add" | "sub" | "mul" | "div";
@@ -116,8 +116,8 @@ export type Child = {
   factsFound: string[];
   journal: JournalEntry[];
   campsCleared: string[];
-  /** Grade band chosen at setup; missing on profiles created before start-level. */
   lanternStyle?: string;
+  /** Legacy starting-practice key; never interpret as actual age/grade. */
   gradeBand?: GradeBand;
   /** Camp id to begin at; camps at or below this stay open for review. */
   startWorldId?: string;

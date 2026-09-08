@@ -2,10 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getLesson, getWorld } from "../data/curriculum";
 import { sounds } from "../lib/audio";
 import { answersMatch } from "../lib/engine";
+import { thinkingWindowMs } from "../lib/pacing";
+import { openingRound } from "../lib/openingRound";
 import { buildRound } from "../lib/facts";
 import { emptyOperationTally, newId } from "../lib/storage";
 import { useActiveChild, useStore } from "../store/StoreContext";
-import { KIND_WINDOW_MS, type Fact, type JournalEntry, type Operation } from "../types";
+import { type Fact, type JournalEntry, type Operation } from "../types";
 import { Keypad } from "./Keypad";
 import { Maggie } from "./Maggie";
 import { BridgeJourney } from "./BridgeJourney";
@@ -20,11 +22,12 @@ export function LessonView({ lessonId }: { lessonId: string }) {
   const { state, dispatch } = useStore();
   const child = useActiveChild();
   const lesson = getLesson(lessonId);
+  const thinkingWindow = lesson ? thinkingWindowMs(lesson) : 12000;
   const world = lesson ? getWorld(lesson.worldId) : undefined;
   const [draft] = useState(() => child && lesson ? readDraft(child, lesson) : null);
   const [sessionId] = useState(() => draft?.sessionId ?? newId());
   const startedAt = useRef(draft?.startedAt ?? Date.now());
-  const facts = useMemo(() => (draft?.facts ?? (lesson ? buildRound(lesson.bank, lesson.questionCount) : [])), [lesson]);
+  const facts = useMemo(() => (draft?.facts ?? (lesson ? (child?.sessions.length === 0 ? openingRound : buildRound)(lesson.bank, lesson.questionCount) : [])), [lesson]);
 
   const [phase, setPhase] = useState<Phase>(draft?.phase ?? "intro");
   const [index, setIndex] = useState(draft ? draft.outcomes.length - (draft.phase === "feedback" ? 1 : 0) : 0);
@@ -78,7 +81,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
     setKindLeft(1);
     const started = askedAt.current;
     const tick = window.setInterval(() => {
-      const left = Math.max(0, 1 - (clock.current.elapsed() - started) / KIND_WINDOW_MS);
+      const left = Math.max(0, 1 - (clock.current.elapsed() - started) / thinkingWindow);
       setKindLeft(left);
       if (left <= 0) setSlow(true);
     }, 80);
@@ -142,7 +145,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
   function pause() {
     if (phase === "intro") return;
     clock.current.pause();
-    if (phase === "ask") setKindLeft(Math.max(0, 1 - (clock.current.elapsed() - askedAt.current) / KIND_WINDOW_MS));
+    if (phase === "ask") setKindLeft(Math.max(0, 1 - (clock.current.elapsed() - askedAt.current) / thinkingWindow));
     setPaused(true);
   }
 
@@ -256,6 +259,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
           <p className="goal">
             {lesson.questionCount} lanterns · pass at {lesson.goals.accuracy}% · take as much time as you need
           </p>
+          <p className="tip">The thinking glow fades gently over {thinkingWindow / 1000} seconds. After that, you can still answer. There is no time limit.</p>
           <button
             className="btn primary"
             onClick={() => {

@@ -22,6 +22,8 @@ export function Results({ lessonId, sessionId }: { lessonId: string; sessionId: 
 
   if (!child || !lesson || !session) return null;
   const world = WORLDS.find((w) => w.id === lesson.worldId);
+  const firstWin = session.passed && child.sessions.filter(s=>s.passed)[0]?.id === session.id;
+  const nextLesson = next ? getLesson(next) : undefined;
   const campJustCleared = session.passed && lesson.clearsCamp && child.campsCleared.includes(lesson.worldId);
 
   let headline = "Pip is proud of that practice.";
@@ -51,6 +53,12 @@ export function Results({ lessonId, sessionId }: { lessonId: string; sessionId: 
       <Pip coat={child.coat} pose={session.passed ? "celebrate" : "sit"} size={120} />
       <h1>{headline}</h1>
       <p className="lede">{body}</p>
+      {firstWin && <section className="panel first-session first-win" aria-label="Your next adventure">
+        <h2>Your first trail is lit!</h2>
+        <p>{nextLesson ? <>You earned {session.stars} star{session.stars===1?'':'s'} and opened <strong>{nextLesson.title}</strong>. Keep lighting trails to reach the campfire.</> : demo ? "You have reached the end of the Ember Grove demo trails. The workshop and replays are still here to explore." : "You reached the last trail. Revisit your camps and keep exploring in the workshops."}</p>
+        <p>Now try moving the math: build a fact in the workshop, then come back for your next trail. Workshop practice does not change your score.</p>
+        <button className="btn model-reset" onClick={()=>dispatch({type:'go',view:{name:'workshop',worldId:lesson.worldId}})}>Practice in the workshop</button>
+      </section>}
       {campJustCleared && (
         <p className="credit-toast">
           Campfire earned! {LANTERNS.find(l=>l.camp===lesson.worldId)?.name} is available at camp.
@@ -86,7 +94,7 @@ export function Results({ lessonId, sessionId }: { lessonId: string; sessionId: 
         <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "map" } })}>
           Camps
         </button>
-        <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "workshop", worldId:lesson.worldId } })}>Practice in the workshop</button>
+        {!firstWin && <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "workshop", worldId:lesson.worldId } })}>Practice in the workshop</button>}
         <button className="btn ghost" onClick={() => dispatch({ type: "go", view: { name: "lesson", lessonId } })}>
           Try again
         </button>

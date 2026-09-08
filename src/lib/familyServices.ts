@@ -1,3 +1,4 @@
+import { resolveStartLevel } from "./startLevel";
 import type { Child, Session } from '../types';
 /** Export-only boundary. Installation is trusted application bootstrap, never URL input. */
 export type FamilyIdentityProvider = { studentId(localChildId:string):string | null };
@@ -22,6 +23,6 @@ export function learningReceipt(session:Session) {
 }
 export function familyExport(child:Child) {
   return {schemaVersion:1,source:'sumtrail',exportedAt:new Date().toISOString(),
-    student:{localId:child.id,studentId:provider?.studentId(child.id) ?? null,name:child.name,gradeBand:child.gradeBand ?? null},
+    student:{localId:child.id,studentId:provider?.studentId(child.id) ?? null,name:child.name,startingPractice:resolveStartLevel(child).label,startingCamp:resolveStartLevel(child).campId},
     receipts:child.sessions.map(learningReceipt)};
 }

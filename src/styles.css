@@ -524,3 +524,9 @@ button:focus-visible,input:focus-visible { outline:3px solid #397eb9; outline-of
 .title-screen .title-points { grid-template-columns:repeat(2,1fr); gap:18px; max-width:900px; width:100%; }
 .title-points li { background:#203b30; padding:20px; border-radius:18px; }
 @media(max-width:520px) { .title-screen .title-points { grid-template-columns:1fr; gap:10px; } }
+
+.first-session { margin-bottom:24px; line-height:1.6; }
+.first-session .eyebrow { color:#526e57; }
+.first-session .row-actions { justify-content:flex-start; margin-bottom:16px; }
+.first-win { max-width:720px; text-align:left; }
+.workshop-return { justify-self:start; }

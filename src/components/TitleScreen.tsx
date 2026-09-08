@@ -20,7 +20,7 @@ export function TitleScreen() {
         <p className="eyebrow">An original math facts adventure</p>
         <h1>Sumtrail</h1>
         <p className="lede">
-          Build a stone garden. Plant a clover array. Share a woodland picnic. Then light the number trail with Pip.
+          Practice math facts with Pip. Each correct answer lights a lantern. Finish trails to reach the campfire and earn a new lantern glow.
         </p>
         {demo && <p className="demo-banner">Demo path: Ember Grove only.</p>}
         <div className="title-actions">
@@ -41,8 +41,8 @@ export function TitleScreen() {
       </header>
       <BridgeJourney coat="ember" mood="dawn" total={8} outcomes={[true,true,true]} />
       <ul className="title-points">
-        <li>Five camps: Ember Grove through Night Sum Summit</li>
-        <li>Hands-on workshops for all four operations</li>
+        <li>{demo ? "Demo: four trails and a workshop in Ember Grove" : "Five camps: addition and subtraction through multiplication and division"}</li>
+        <li>{demo ? "Build addition and subtraction facts in the stone workshop" : "Build stones, plant arrays, and share berries in hands-on workshops"}</li>
         <li>Saved trails, guided corrections, and lanterns you can make your own</li>
         <li>PIN-protected grown-up reports, same as Keytrail and Camp Compass</li>
       </ul>

@@ -1,6 +1,6 @@
 import { availableLanterns, LANTERNS } from "../lib/keepsakes";
 import { BridgeJourney } from "./BridgeJourney";
-import { lessonsInWorld } from "../data/curriculum";
+import { getLesson, getWorld, lessonsInWorld } from "../data/curriculum";
 import { visibleWorlds } from "../lib/demo";
 import { childStartWorldId, describeStartLevel } from "../lib/startLevel";
 import { isLessonUnlocked, maxStars, progressPercent, recommendedLessonId, totalStars } from "../lib/stats";
@@ -16,6 +16,8 @@ export function TrailMap() {
   const rec = recommendedLessonId(child, demo);
   const worlds = visibleWorlds(demo);
   const startWorld = childStartWorldId(child);
+  const firstTrail = getLesson(rec)!;
+  const startingCamp = getWorld(firstTrail.worldId)!;
 
   return (
     <div className="screen map-screen">
@@ -28,7 +30,7 @@ export function TrailMap() {
           <div>
             <h1>{child.name}’s camps</h1>
             <p>
-              Starts at {describeStartLevel(child)}
+              {demo ? "Demo starts in Ember Grove" : `Starts at ${describeStartLevel(child)}`}
               {demo ? " · demo keeps later camps folded" : ""}
               {" · "}
               {progressPercent(child, demo)}% lit · {totalStars(child)}/{maxStars(demo)} stars · {child.journal.length}{" "}
@@ -49,7 +51,15 @@ export function TrailMap() {
         </div>
       </header>
 
-      {demo && <p className="demo-banner">Demo mode keeps later camps folded until the family hub unlocks them.</p>}
+      {demo && <p className="demo-banner">Demo: Ember Grove’s four trails and its addition/subtraction workshop. Later camps are outside this demo.</p>}
+      {child.sessions.length === 0 && <section className="panel first-session" aria-label="Your first adventure">
+        <p className="eyebrow">YOUR FIRST ADVENTURE · {startingCamp.name}</p>
+        <h2>Light your first {firstTrail.questionCount} lanterns.</h2>
+        <p>Start with <strong>{firstTrail.title}</strong>. Each correct answer lights a lantern and carries Pip toward camp. Mistakes show you a helpful correction; you can always keep going.</p>
+        <p>Pass trails to open the next one. Clear this camp’s campfire trail to earn a lantern glow you can use. The kind lantern never runs out of turns — no rush.</p>
+        <div className="row-actions"><button className="btn primary" onClick={()=>dispatch({type:'go',view:{name:'lesson',lessonId:rec}})}>Start my first trail</button><button className="btn model-reset" onClick={()=>dispatch({type:'go',view:{name:'workshop',worldId:firstTrail.worldId}})}>Explore the workshop first</button></div>
+        <small>Workshops let you build and move the math, without a timer or score.</small>
+      </section>}
 
       <section className="camp-overview">
         <div><p className="eyebrow">YOUR CAMP, ONE DISCOVERY AT A TIME</p><h2>The lantern keepers’ trail</h2><p>Explore a workshop, walk a trail, and earn a new glow at each campfire.</p></div>

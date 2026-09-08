@@ -1,6 +1,6 @@
 const {spawnSync}=require('node:child_process');
 const path=require('node:path');
-for(const script of ['browser-smoke.cjs','expedition-browser.cjs']) {
+for(const script of ['first-session.cjs','browser-smoke.cjs','expedition-browser.cjs']) {
  const result=spawnSync(process.execPath,[path.join(__dirname,script)],{stdio:'inherit',env:process.env});
  if(result.status!==0) process.exit(result.status||1);
 }

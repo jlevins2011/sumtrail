@@ -16,7 +16,7 @@ Workshops are untimed exploration. Their models do not award stars or affect rep
 
 Pip travels across the lantern bridge as answers arrive. Correct lanterns stay lit; mistakes remain marked. Campfire clears unlock five lantern styles that can be selected at camp and used on trails. Existing camp clears retain their rewards.
 
-Select a starting grade when adding a child. Earlier camps remain available for review; later scored trails unlock sequentially. `?demo=1` limits the game to Ember Grove.
+Select starting practice, with grade guidance, when adding a child. Earlier camps remain available for review; later scored trails unlock sequentially. `?demo=1` limits the game to Ember Grove.
 
 ## Saving and accessibility
 
@@ -54,3 +54,15 @@ Unit tests cover curriculum, mathematical models (including zero and equal divis
 ## Original assets
 
 Pip, the woodland scenery, visual models, and interface are project-owned original work. No Nintendo or other licensed game characters, art, or music are used. All rights reserved unless you choose another license for commercialization.
+
+## 2.0.1 — clearer starts, useful facts, calmer pacing
+
+The starting-practice picker labels within-10 fluency as Grade 1, within-20 fluency as Grade 2, both multiplication and division facts as Grade 3, and the summit as mixed fact review. Tables through 12 are explicitly extensions; this is not a full Grade 4/5 curriculum. Kindergarten within-5 practice is the opening of Ember Grove, not the scope of its whole camp. Existing profile keys and chosen camps remain intact; they are not interpreted as the child's age.
+
+Fresh explorers get an orientation, a non-padding first round within the selected bank, and a first-win route to a hands-on workshop and the next trail. Ordinary trails now lead with core practice and include at most one identity fact per eight questions. The dedicated zero/one multiplication lesson remains available. Existing saved rounds resume their original deck.
+
+The visual thinking allowance is 12 seconds in Ember Grove, 18 in Pine Bridge, 24 in Multiplying Meadow (30 for extension tables), 30 in Division Hollow (36 for extensions), and 36 in Night Sum. The glow fading never expires an answer or fails a player. Smoothness scoring uses the same longer allowance; accuracy gates are unchanged. These durations are gameplay choices, not Common Core requirements.
+
+Alignment references: [1.OA.C.6](https://www.thecorestandards.org/Math/Content/1/OA/), [2.OA.B.2](https://www.thecorestandards.org/Math/Content/2/OA/), and [3.OA.C.7](https://www.thecorestandards.org/Math/Content/3/OA/).
+
+Verify with a fresh explorer: choose Ember Grove, complete its six positive-addend opening facts, visit the workshop from the first win, then use “Ready for a trail: Friendly tens” to continue. Repeat at `?demo=1`; the workshop and next trails stay in Ember Grove. With another fresh explorer, choose mixed review and check the 36-second thinking-glow explanation before starting. The practice picker, settings, and parent reports all describe the same practice placement. `tests/first-session.cjs` covers the first-win route, demo behavior, second-trail continuation, and two-explorer isolation.
